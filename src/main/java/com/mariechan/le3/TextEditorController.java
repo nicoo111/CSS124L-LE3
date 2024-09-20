@@ -6,15 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -28,6 +27,8 @@ public class TextEditorController {
     private boolean isTextChanged = false;
     private String documentTitle = "Untitled Document.txt";
     private File currentFile = null;
+//    private List<String> recentFiles = new ArrayList<>();
+//    private ListView<String> recentFilesList = new ListView<>();
 
     @FXML
     public void initialize() {
@@ -151,6 +152,11 @@ public class TextEditorController {
             }
         }
     }
+
+//    public void updateRecentFilesList(){
+//        recentFilesList.getItems().clear();
+//        recentFilesList.getItems().addAll(recentFiles);
+//    }
 
     public void setFile(File file) {
         currentFile = file;

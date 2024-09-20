@@ -18,7 +18,8 @@ public class MainController {
     VBox parent;
     @FXML
     private Button closeButton;
-
+    @FXML
+    private VBox recentFiles;
 
     
     
