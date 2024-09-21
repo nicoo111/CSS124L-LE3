@@ -20,8 +20,6 @@ public class MainController {
     private Button closeButton;
     @FXML
     private VBox recentFiles;
-
-    
     
     @FXML
     public void handleNew() throws IOException {

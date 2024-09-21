@@ -6,14 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -35,7 +36,7 @@ public class TextEditorController {
         textArea.textProperty().addListener((observable, oldValue, newValue) -> {
             isTextChanged = true;
             Stage stage = (Stage) textArea.getScene().getWindow();
-            stage.setTitle(documentTitle + " (Unsaved)");
+            stage.setTitle(documentTitle + " (In Progress)");
         });
 
         Platform.runLater(() -> {
@@ -77,7 +78,6 @@ public class TextEditorController {
         dialog.setTitle("Unsaved changes in " + documentTitle);
         dialog.setHeaderText("You have unsaved changes.");
         dialog.setContentText("Do you want to save your changes before closing?");
-
         ButtonType saveButton = new ButtonType("Save", ButtonData.YES);
         ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonData.NO);
         ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
@@ -111,45 +111,30 @@ public class TextEditorController {
 
     public void save(boolean saveAsNewFile) {
         var text = textArea.getText();
-        var stage = (Stage) textArea.getScene().getWindow();
-        if (saveAsNewFile) {
+        Stage stage = (Stage) textArea.getScene().getWindow();
+    
+        if (saveAsNewFile || currentFile == null) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialFileName("Untitled");
             fileChooser.setTitle("Save file");
-            fileChooser.getExtensionFilters().add(new ExtensionFilter("Text", "*.txt"));
-            var file = fileChooser.showSaveDialog(stage);
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("Text Files", "*.txt"));
+            
+            File file = fileChooser.showSaveDialog(stage);
             if (file != null) {
+                currentFile = file;
                 documentTitle = file.getName();
-                stage.setTitle(documentTitle);
-
-                try (FileWriter fileWriter = new FileWriter(file)) {
-                    fileWriter.write(text);
-                    isTextChanged = false;
-                    currentFile = file;
-                } catch (IOException e) {
-                    System.out.println("Something went wrong.");
-                    e.printStackTrace();
-                }
-
+            } else {
+                return; 
             }
-        } else if (currentFile == null) {
-            save(true);
-            return;
-        } else {
-
-            if (currentFile != null) {
-                documentTitle = currentFile.getName();
-                stage.setTitle(documentTitle);
-
-                try (FileWriter fileWriter = new FileWriter(currentFile)) {
-                    fileWriter.write(text);
-                    isTextChanged = false;
-
-                } catch (IOException e) {
-                    System.out.println("Something went wrong.");
-                    e.printStackTrace();
-                }
-            }
+        }
+    
+        try (FileWriter fileWriter = new FileWriter(currentFile)) {
+            fileWriter.write(text);
+            isTextChanged = false;
+            stage.setTitle(documentTitle);
+        } catch (IOException e) {
+            System.out.println("Error saving file.");
+            e.printStackTrace();
         }
     }
 
